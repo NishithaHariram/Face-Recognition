@@ -287,7 +287,7 @@ try:
     demo_system = FaceRecoginationDemo(model_path)
 
     print("Getting random test images...")
-    test_images = get_random_test_images(dataset_path,demo_system.le.classes_ ,num_images=100)
+    test_images = get_random_test_images(dataset_path,demo_system.le.classes_ ,num_images=25)
 
     print("Making predictions...")
     predictions = []
@@ -329,3 +329,40 @@ for true_name, _ in test_images:
         f"{true_name} -> {'TRAINED' if true_name in trained_people else 'NOT TRAINED'}"
     )
 
+from sklearn.metrics import classification_report,confusion_matrix,accuracy_score,precision_score,recall_score,f1_score
+
+print("="*60)
+print("MODEL PERFORMANCE EVALUATION")
+print("="*60)
+
+# Overall Accuracy
+accuracy = accuracy_score(results['y_test'], results['y_pred'])
+print(f"\nAccuracy: {accuracy:.4f} ({accuracy*100:.2f}%)")
+
+# Precision, Recall, F1 Score
+precision = precision_score(results['y_test'],results['y_pred'],average='weighted',zero_division=0)
+
+recall = recall_score(results['y_test'],results['y_pred'],average='weighted',zero_division=0)
+
+f1 = f1_score(results['y_test'],results['y_pred'],average='weighted',zero_division=0)
+
+print(f"Precision: {precision:.4f}")
+print(f"Recall:    {recall:.4f}")
+print(f"F1-Score:  {f1:.4f}")
+
+print("\n" + "="*60)
+print("CLASSIFICATION REPORT")
+print("="*60)
+
+# Convert labels back to names
+y_true_names = face_System.le.inverse_transform(results['y_test'])
+y_pred_names = face_System.le.inverse_transform(results['y_pred'])
+
+print(classification_report(y_true_names,y_pred_names,zero_division=0))
+
+print("\n" + "="*60)
+print("CONFUSION MATRIX")
+print("="*60)
+
+cm = confusion_matrix(results['y_test'], results['y_pred'])
+print(cm)
